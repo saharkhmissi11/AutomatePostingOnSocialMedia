@@ -1,0 +1,11 @@
+.cont{
+  
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.cc{
+    height: 500px;
+    width:500;
+}
