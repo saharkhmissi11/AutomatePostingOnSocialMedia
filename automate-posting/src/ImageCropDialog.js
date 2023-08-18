@@ -15,25 +15,24 @@ import Modal from 'react-bootstrap/Modal';
 import { Col, Row, Container } from "react-bootstrap";
 import client from "./utils";
 
-const p={
-  facebook:facebook,
-  instagram:instagram,
-  twitter:twitter,
+const p = {
+  Facebook: facebook,
+  Fnstagram: instagram,
+  Twitter: twitter,
+}
+const aspectRatios = {
+  Facebook: 1200 / 1400,
+  Instagram: 1080 / 1080,
+  Twitter: 1600 / 900,
 }
 const ImageCropDialog = ({
-  selectedPlatform, open, handleClose
+  selectedPlatform, open, handleClose,project,product
 }) => {
-  const aspectRatios = {
-    facebook: 1200 / 1400,
-    instagram: 1080 / 1080,
-    twitter: 1600 / 900,
-  };
+ 
   const aspectRatio = aspectRatios[selectedPlatform];
-
   const [imageLinks, setImageLinks] = useState([]);
   useEffect(() => {
-    // Fetch image links from your API endpoint    
-    client.get('DropBox/GetImagesLinks', { headers: { 'Content-Type': 'application/json', } })
+    client.get(`DropBox/GetMediasInProduct/${project}/${product}`, { headers: { 'Content-Type': 'application/json', } })
       .then(response => {
         setImageLinks(response.data);
       })
@@ -42,19 +41,19 @@ const ImageCropDialog = ({
       });
   }, []);
 
-
-  const [croppedImageUrls, setCroppedImageUrls] = useState([]);
   const initialCropState = [];
   const initialZoomState = [];
   for (let i = 0; i < imageLinks.length; i++) {
     initialCropState.push({ x: 0, y: 0 });
     initialZoomState.push(1);
   }
-  const [cropperCrop, setCropperCrop] = useState([]);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState([]);
+  const [cropperCrop, setCropperCrop] = useState(new Array(imageLinks.length).fill({ x: 0, y: 0 }));
   const [cropperZoom, setCropperZoom] = useState(new Array(imageLinks.length).fill(1));
   for (let i = 0; i < imageLinks.length; i++) {
     cropperCrop.push({ x: 0, y: 0 });
     cropperZoom.push(1);
+    croppedAreaPixels.push(null);
   }
 
   const VerticalLineWithShadow = () => {
@@ -64,57 +63,47 @@ const ImageCropDialog = ({
   };
 
 
-
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(new Array(imageLinks.length).fill(null));
-
-
-
-
-
   const onCropChange = (crop, index) => {
     setCropperCrop(prevCrop => {
-      const newCrop = [...prevCrop];
-      newCrop[index] = { ...newCrop[index], x: crop.x, y: crop.y }; // Update the x property
+      var newCrop = [...prevCrop];
+      newCrop[index] = { ...newCrop[index], x: crop.x, y: crop.y };
+
       return newCrop;
     });
   };
   const onZoomChange = (zoom, index) => {
     setCropperZoom(prevZoom => {
-      const newZoom = [...prevZoom];
+      var newZoom = [...prevZoom];
       newZoom[index] = zoom;
       return newZoom;
     });
   };
-
-
-  const onCropComplete = (croppedArea, croppedAreaPixels, index) => {
-    setCroppedAreaPixels((prevCroppedAreaPixels) => {
-      const newCroppedAreaPixels = [...prevCroppedAreaPixels];
-      newCroppedAreaPixels[index] = croppedAreaPixels; // Update the cropped area pixels for the specific image
+  const onCropComplete = (croppedArea, c, index) => {
+    setCroppedAreaPixels(prevCroppedAreaPixels => {
+      var newCroppedAreaPixels = [...prevCroppedAreaPixels];
+      newCroppedAreaPixels[index] = c;
       return newCroppedAreaPixels;
     });
   };
-
-
-  // encodeURIComponent(croppedImageUrl)
-  const onBeginProcess = async (imageUrl) => {
-
-    const requestBody = {
-      primaryProduct: "primaryProduct",
-      secondaryProducts: "secondaryProducts",
-      imagePathFacebook: await getCroppedImg(imageUrl, croppedAreaPixels, selectedPlatform),
-      imagePathInstagram: await getCroppedImg(imageUrl, croppedAreaPixels, selectedPlatform),
-      imagePathTwitter: await getCroppedImg(imageUrl, croppedAreaPixels, selectedPlatform),
-
-    };
-    client.post("Process/begin", requestBody, {
-      headers: {
-        'Content-Type': 'application/json', // Use 'application/json' for JSON data
+  
+  const onBeginProcess = async () => {
+    var requestBody = {}
+    imageLinks.map(async (link, index) => (
+      requestBody = {
+        primaryProduct: product,
+        secondaryProducts: "secondaryProducts",
+        imagePath: await getCroppedImg(link, croppedAreaPixels[index], selectedPlatform),
+        platform: selectedPlatform
       },
-    })
-      .then(response => console.log("result put ", response))
-      .catch(error => console.error("Error:", error)); // Use error parameter to catch errors
-  };
+      client.post("Process/begin", requestBody, {
+        headers: {
+          'Content-Type': 'application/json', // Use 'application/json' for JSON data
+        },
+      })
+        .then(response => console.log("result put ", response))
+        .catch(error => console.error("Error:", error)) // Use error parameter to catch errors
+    ))
+  }
   return (
     <Modal show={open} fullscreen={true} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -126,82 +115,61 @@ const ImageCropDialog = ({
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-
         <Row>
           <Col xs={1}><img style={{ width: '35px' }} src={p[selectedPlatform]} /></Col> {'\u00a0'}
-
           <Col xs={10}>  <h4 >{selectedPlatform}</h4></Col>
         </Row><br></br>
-
         <Container>
-                  <Col xs={"auto"}>
-
-                  </Col>
-                  <Col>    
-          <Row>
-
-           
-            {
-              imageLinks.map((link, index) => (
-
-                <>
-
-                  <Col xs="auto">
-                    <Row>
-                      <Cropper
-                        key={index}
-                        image={link}
-                        zoom={cropperZoom[index]}
-                        crop={cropperCrop[index]}
-                        aspect={aspectRatio}
-                        onCropChange={crop => onCropChange(crop, index)}
-                        onZoomChange={zoom => onZoomChange(zoom, index)}
-                        onCropComplete={(croppedArea, croppedAreaPixels) => onCropComplete(croppedArea, croppedAreaPixels[index], index)}
-                        style={
-                          {
+          <Col xs={"auto"}></Col>
+          <Col>
+            <Row>
+              {
+                imageLinks.map((link, index) => (
+                  <>
+                    <Col xs="auto">
+                      <Row>
+                        <Cropper
+                          image={link}
+                          zoom={cropperZoom[index]}
+                          crop={cropperCrop[index]}
+                          aspect={aspectRatios[selectedPlatform]}
+                          onCropChange={crop => onCropChange(crop, index)}
+                          onZoomChange={zoom => onZoomChange(zoom, index)}
+                          onCropComplete={(croppedArea, crop) => onCropComplete(croppedArea, crop, index)}
+                          style={{
                             containerStyle: {
                               position: 'relative',
-                              width: '250px', // Set the width to 500px
-                              height: '250px', // Set the height to 500px
+                              width: '250px',
+                              height: '250px',
                             },
-
-                            cropGuideStyle: {}, // You can customize the crop guide style if needed
+                            cropGuideStyle: {},
                             mediaStyle: {},
                           }
-                        }
-                      />  </Row><br></br>
-                    <Row>
-
-                      <input
-                        type="range"
-                        min={1}
-                        max={3}
-                        step={0.1}
-                        value={cropperZoom[index]}
-                        onInput={(e) => {
-                          onZoomChange(e.target.value, index); // Pass index to onZoomChange
-                        }}
-                        className="slider"
-                      ></input><br></br><br></br>
-                    </Row>
-
-                  </Col>
-                  <Col xs={"auto"}>
-
-                  </Col>
-
-
-                </>
-              )
-              )
-            }
-
-          </Row> 
+                          }
+                        />  </Row><br></br>
+                      <Row>
+                        <input
+                          type="range"
+                          min={1}
+                          max={3}
+                          step={0.1}
+                          value={cropperZoom[index]}
+                          onInput={(e) => {
+                            onZoomChange(e.target.value, index); // Pass index to onZoomChange
+                          }}
+                          className="slider"
+                        ></input><br></br><br></br>
+                      </Row>
+                    </Col>
+                    <Col xs={"auto"}></Col>
+                  </>
+                )
+                )
+              }
+            </Row>
           </Col>
         </Container>
-
       </Modal.Body>
-
       <Modal.Footer >
         <Button style={{ width: '100px' }} variant="primary" onClick={() => { handleClose(); onBeginProcess() }}>
           Crop

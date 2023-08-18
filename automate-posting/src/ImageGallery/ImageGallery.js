@@ -29,14 +29,14 @@ function ImageGallery() {
       {selectedPlatform && (
       <ImageCropDialog
         selectedPlatform={selectedPlatform}
-        open={true} // Show the dialog directly
-        handleClose={() => setSelectedPlatform(null)} // Close the dialog when needed
+        open={true} 
+        handleClose={() => setSelectedPlatform(null)} 
       />
     )}
     <div >
-      <button onClick={() => handlePlatformSelection('facebook')}>Facebook</button>
-      <button onClick={() => handlePlatformSelection('twitter')}>Twitter</button>
-      <button onClick={() => handlePlatformSelection('instagram')}>Instagram</button>
+      <button onClick={() => handlePlatformSelection('Facebook')}>Facebook</button>
+      <button onClick={() => handlePlatformSelection('Twitter')}>Twitter</button>
+      <button onClick={() => handlePlatformSelection('Instagram')}>Instagram</button>
     </div>
 
   
