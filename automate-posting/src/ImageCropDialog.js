@@ -26,12 +26,18 @@ const aspectRatios = {
   Twitter: 1600 / 900,
 }
 const ImageCropDialog = ({
-  selectedPlatform, open, handleClose,project,product
+  selectedPlatform, open, handleClose, project, product
 }) => {
- 
+
   const aspectRatio = aspectRatios[selectedPlatform];
-  const [imageLinks, setImageLinks] = useState([]);
-  useEffect(() => {
+  //const [imageLinks, setImageLinks] = useState([]);
+  const [mediaRequests, setMediaRequests] = useState([]);
+
+  const [visibleProductsReference, setVisibleProductsReference] = useState('');
+  const [mediaId, setMediaId] = useState();
+  const [productId, setProductId] = useState();
+  const [projectId, setProjectId] = useState();
+  /*useEffect(() => {
     client.get(`DropBox/GetMediasInProduct/${project}/${product}`, { headers: { 'Content-Type': 'application/json', } })
       .then(response => {
         setImageLinks(response.data);
@@ -39,18 +45,65 @@ const ImageCropDialog = ({
       .catch(error => {
         console.error('Error fetching image links:', error);
       });
+  }, []);*/
+  useEffect(() => {
+    client.get(`DropBox/GetMediasInProduct/${project}/${product}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        setMediaRequests(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching media:', error);
+      });
   }, []);
-
+  //Get ProductId
+  useEffect(() => {
+    client.get(`Database/getProductIdByReference/${product}`)
+      .then(response => {
+        setProductId(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching productId :', error);
+      });
+  }, []);
+  // Get projectId
+  useEffect(() => {
+    client.get(`Database/getProjectIdByTitle/${project}`)
+      .then(response => {
+        setProjectId(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching productId :', error);
+      });
+  }, []);
+  /* useEffect(() => {
+     // Define your mediaId and projectId values
+     const mediaId = 123;
+     const projectId = 456;
+ 
+     // Make the HTTP GET request
+     client.get(`/getVisibleProducts/${mediaId}/${projectId}`)
+       .then(response => {
+         const data = response.data;
+         setVisibleProductsReference(data);
+       })
+       .catch(error => {
+         console.error('Error fetching visible products:', error);
+       });
+   }, []);*/
   const initialCropState = [];
   const initialZoomState = [];
-  for (let i = 0; i < imageLinks.length; i++) {
+  for (let i = 0; i < mediaRequests.length; i++) {
     initialCropState.push({ x: 0, y: 0 });
     initialZoomState.push(1);
   }
   const [croppedAreaPixels, setCroppedAreaPixels] = useState([]);
-  const [cropperCrop, setCropperCrop] = useState(new Array(imageLinks.length).fill({ x: 0, y: 0 }));
-  const [cropperZoom, setCropperZoom] = useState(new Array(imageLinks.length).fill(1));
-  for (let i = 0; i < imageLinks.length; i++) {
+  const [cropperCrop, setCropperCrop] = useState(new Array(mediaRequests.length).fill({ x: 0, y: 0 }));
+  const [cropperZoom, setCropperZoom] = useState(new Array(mediaRequests.length).fill(1));
+  for (let i = 0; i < mediaRequests.length; i++) {
     cropperCrop.push({ x: 0, y: 0 });
     cropperZoom.push(1);
     croppedAreaPixels.push(null);
@@ -85,24 +138,34 @@ const ImageCropDialog = ({
       return newCroppedAreaPixels;
     });
   };
-  
+  //begin the process
   const onBeginProcess = async () => {
+
     var requestBody = {}
-    imageLinks.map(async (link, index) => (
-      requestBody = {
-        primaryProduct: product,
-        secondaryProducts: "secondaryProducts",
-        imagePath: await getCroppedImg(link, croppedAreaPixels[index], selectedPlatform),
-        platform: selectedPlatform
-      },
-      client.post("Process/begin", requestBody, {
-        headers: {
-          'Content-Type': 'application/json', // Use 'application/json' for JSON data
-        },
-      })
-        .then(response => console.log("result put ", response))
-        .catch(error => console.error("Error:", error)) // Use error parameter to catch errors
-    ))
+    await Promise.all(
+      mediaRequests.map(async (media, index) => {
+        const mediaResponse = await client.get(`Database/getMediaIdByUrl/${encodeURIComponent("/shootingflow/projects/" + project + "/medias/" + product + "/" + media.name)}`);
+        const mediaId = mediaResponse.data;
+        console.log("mediaid",mediaId)
+        console.log("productId",projectId)
+        const vpresponse = await client.get(`Database/getVisibleProducts/${mediaId}/${projectId}`)
+        const visibleProductsReference = vpresponse.data;
+        console.log("visibleProductsReference",visibleProductsReference)
+        const imagePath = await getCroppedImg(media.path, croppedAreaPixels[index], selectedPlatform);
+        const requestBody = {
+          primaryProduct: product,
+          secondaryProducts: visibleProductsReference,
+          imagePath: imagePath,
+          platform: selectedPlatform
+        };
+          client.post("Process/begin", requestBody, {
+            headers: {
+              'Content-Type': 'application/json', // Use 'application/json' for JSON data
+            },
+          })
+            .then(response => console.log("result put ", response))
+            .catch(error => console.error("Error:", error)) // Use error parameter to catch errors
+      }))
   }
   return (
     <Modal show={open} fullscreen={true} onHide={handleClose}>
@@ -124,12 +187,12 @@ const ImageCropDialog = ({
           <Col>
             <Row>
               {
-                imageLinks.map((link, index) => (
+                mediaRequests.map((media, index) => (
                   <>
                     <Col xs="auto">
                       <Row>
                         <Cropper
-                          image={link}
+                          image={media.path}
                           zoom={cropperZoom[index]}
                           crop={cropperCrop[index]}
                           aspect={aspectRatios[selectedPlatform]}

@@ -36,19 +36,13 @@ function Projects() {
                 <span class="folder-icon">&#128193;</span>
                 <span onClick={() => onProjectSelect(name)}  class="folder-name">{name}</span>
               </div>
+              {selectedProject &&selectedProject==name && (<Medias project={selectedProject}></Medias>)}
             </>
               ))
           }
   </div>
       </div>
-      <br></br>
-      {selectedProject && <div className="separator"></div>}
-      {selectedProject && (
-      <Medias
-         project={selectedProject}
-      ></Medias>
-    )
-    }
+      
     </>
 
   );

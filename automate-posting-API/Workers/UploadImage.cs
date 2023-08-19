@@ -6,7 +6,7 @@ namespace PostingOnSociallMedia.Workers
 
     [ExternalTaskTopic("Upload-Image")]
     //With this annotation, the system knows that this class  is a camunda task worker
-    [ExternalTaskVariableRequirements("imageName", "imagePathToUploadFacebook", "imagePathToUploadInstagram", "imagePathToUploadTwitter")] //required variables in order to execute the task worker
+    [ExternalTaskVariableRequirements("imageName", "imagePathToUpload","platform")] //required variables in order to execute the task worker
     public class UploadImage : IExternalTaskAdapter
     {
         HttpClient httpClient = new HttpClient();
@@ -19,10 +19,10 @@ namespace PostingOnSociallMedia.Workers
             Console.WriteLine("UploadImage starts");
             Thread.Sleep(3000);
             string imageName = Convert.ToString(externalTask.Variables["imageName"].Value);
-            string imagePathToUploadFacebook = Convert.ToString(externalTask.Variables["imagePathToUploadFacebook"].Value);
-            string imagePathToUploadInstagram = Convert.ToString(externalTask.Variables["imagePathToUploadInstagram"].Value);
-            string imagePathToUploadTwitter = Convert.ToString(externalTask.Variables["imagePathToUploadTwitter"].Value);
-            var imageNameResponse = httpClient.PostAsJsonAsync($"https://localhost:7147/api/DropBox/Upload/{imageName}", imageName);
+            string platform = Convert.ToString(externalTask.Variables["platform"].Value);
+            string imagePathToUpload = Convert.ToString(externalTask.Variables["imagePathToUpload"].Value);
+            var requestContent = new { ImageName = imageName, Platform = platform };
+            var imageNameResponse = httpClient.PostAsJsonAsync($"https://localhost:7147/api/DropBox/Upload",requestContent);
 
         }
     }

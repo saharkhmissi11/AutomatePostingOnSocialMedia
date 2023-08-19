@@ -61,26 +61,19 @@ const Medias = ({
                             <Row>
                                 
                                 <Col><img  onClick={() => {onPlatformSelect("Facebook");handleClose()}} xs={1} style={{ width: '40px' }} src={facebook}></img></Col>
-                                <Col><img  onClick={() => onPlatformSelect("Instagram")} xs={1} style={{ width: '40px' }} src={instagram}></img></Col>
-                                <Col><img  onClick={() => onPlatformSelect("Twitter")} xs={1} style={{ width: '40px' }} src={twitter}></img></Col>
+                                <Col><img  onClick={() => {onPlatformSelect("Instagram");handleClose()}} xs={1} style={{ width: '40px' }} src={instagram}></img></Col>
+                                <Col><img  onClick={() => {onPlatformSelect("Twitter");handleClose()}} xs={1} style={{ width: '40px' }} src={twitter}></img></Col>
                             </Row>
                             
                         </Container>
 
                 </div></Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleClose}>
-                        Save Changes
-                    </Button>
-                </Modal.Footer>
+                
             </Modal>
-            <br></br>
+            
             <div className="projectsContainer">
-                <h2>Products in {project}</h2><br></br>
-                <div class="folder-list">
+                
+                
                     {
                         productsInProject.map((name, index) => (
                             <>
@@ -92,7 +85,7 @@ const Medias = ({
                             </>
                         ))
                     }
-                </div>
+                
             </div>  <br></br>
             
         </>

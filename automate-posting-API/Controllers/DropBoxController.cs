@@ -9,6 +9,8 @@ using PostingOnSocialMedia.Models;
 using System.Web;
 using Aspose.Imaging.Xmp;
 using Microsoft.AspNetCore.Cors;
+using PostingOnSociallMedia.sf_sezane;
+using PostingOnSociallMedia.Models;
 
 namespace PostingOnSocialMedia.Controllers
 {
@@ -18,8 +20,8 @@ namespace PostingOnSocialMedia.Controllers
 
     public class DropBoxController : ControllerBase
     {
-        private readonly SocialMediaDbContext _context;
-        DropboxClient dropboxClient = new DropboxClient("sl.BkRNeARxZfsbkldM3oDcQb1wKp_OLTMycZQOHdXwFlnpv33ymTeuYLfxvpb4le0CvyY3slnAWzED2UwtpemwggklCNfULhzaAqeWsrkn-4Yuechh56PdvLwd7pEF9AOahjfpeCLolnTCcpkQfStAag8");
+        private readonly SfSezaneContext _context;
+        DropboxClient dropboxClient = new DropboxClient("sl.BkefYtEFvUMQNCmxS4A0-CaTyNbvcymPShqsAVVlK0n-HKfbQz2zTW2u7zhCWBELf1uME6kX2VP75rfkOeqJVPlmHKL8aSoP58B_u-QOE2g_4uWkyNIyBU70VeqHSv0fbwQGtH9P8Ht6d2IMvWi2tW8");
         [HttpGet("Download/{product}")]
         //path="/Products/image.jpg"
         public async Task<ActionResult<string>> Download(string product)
@@ -39,7 +41,7 @@ namespace PostingOnSocialMedia.Controllers
                         path = "C:/automate-posting" + product;
                         return path;
                     }
-                }    
+                }
             }
             catch (Exception ex)
             {
@@ -48,38 +50,36 @@ namespace PostingOnSocialMedia.Controllers
 
             return NotFound();
         }
-        [HttpPost("Upload/{product}")]
-        public async Task<ActionResult<string>> Upload(string product)
+        [HttpPost("Upload")]
+        public async Task<ActionResult<string>> Upload([FromBody] UploadRequestModel model)
         {
-            List<string> platforms = new List<string>();
-            platforms.Add("Facebook");
-            platforms.Add("Instagram");
-            platforms.Add("Twitter");
-            foreach (string platform in platforms)
+            string imageName = model.ImageName;
+            string platform = model.Platform;
+
+
+            string filePath = "C:/automate-posting/ProductsMD/" + platform + "/" + HttpUtility.UrlDecode(imageName);
+            Console.WriteLine(filePath);
+            try
             {
-                string filePath = "C:/automate-posting/ProductsMD/" + platform + "/" + HttpUtility.UrlDecode(product);
-                Console.WriteLine(filePath);
-                try
+                string dropboxFolderPath = "/UploadedMedias/" + platform;
+                Console.WriteLine(dropboxFolderPath);
+                string fileName = Path.GetFileName(filePath);
+                string dropboxFilePath = dropboxFolderPath + "/" + fileName;
+                using (var fileStream = System.IO.File.Open(filePath, FileMode.Open))
                 {
-                    string dropboxFolderPath = "/Uploaded_Products/" + platform;
-                    Console.WriteLine(dropboxFolderPath);
-                    string fileName = Path.GetFileName(filePath);
-                    string dropboxFilePath = dropboxFolderPath + "/" + fileName;
-                    using (var fileStream = System.IO.File.Open(filePath, FileMode.Open))
-                    {
-                        var uploadedFile = await dropboxClient.Files.UploadAsync(
-                            dropboxFilePath,
-                            WriteMode.Overwrite.Instance,
-                            body: fileStream
-                        );
-                        Console.WriteLine($"Uploaded: {uploadedFile.PathDisplay}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"This is an error: {ex.Message}");
+                    var uploadedFile = await dropboxClient.Files.UploadAsync(
+                        dropboxFilePath,
+                        WriteMode.Overwrite.Instance,
+                        body: fileStream
+                    );
+                    Console.WriteLine($"Uploaded: {uploadedFile.PathDisplay}");
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"This is an error: {ex.Message}");
+            }
+
 
             return Ok();
         }
@@ -87,15 +87,28 @@ namespace PostingOnSocialMedia.Controllers
         [HttpGet("GetDisplayPath/{image}")]
         public async Task<ActionResult<string>> GetDisplayPath(string image)
         {
-            var link = await dropboxClient.Files.GetTemporaryLinkAsync("/Products" + "/" + image);
+            var link = await dropboxClient.Files.GetTemporaryLinkAsync("/Medias" + "/" + image);
             if (link == null) { return NotFound(); }
             return link.Link;
 
         }
-        [HttpGet("GetImagesLinks")]
-        public async Task<ActionResult> GetImagesLinks()
+         [HttpGet("GetImagesLinks")]
+         public async Task<ActionResult> GetImagesLinks()
+         {
+             var files = await dropboxClient.Files.ListFolderAsync("/Medias");
+             List<string> paths = new List<string>();
+             foreach (var file in files.Entries)
+             {
+                 paths.Add(file.Name);
+             }
+             return Ok(paths);
+         }
+       
+        /// 
+      /* [HttpGet("GetMediasInProduct/{project}/{product}")]
+        public async Task<ActionResult> GetMediasInProduct(string product ,string project)
         {
-            var files = await dropboxClient.Files.ListFolderAsync("/Products");
+            var files = await dropboxClient.Files.ListFolderAsync("/projects/"+project +"/medias/"+ product);
             List<string> paths = new List<string>();
             foreach (var file in files.Entries)
             {
@@ -103,14 +116,66 @@ namespace PostingOnSocialMedia.Controllers
             }
             // return links;
             List<string> links = new List<string>();
-            List<object> images = new List<object>();
             foreach (var path in paths)
             {
                 var link = await dropboxClient.Files.GetTemporaryLinkAsync(path);
                 links.Add(link.Link);
             }
             return Ok(links);
+        }*/
+        [HttpGet("GetMediasInProduct/{project}/{product}")]
+        public async Task<ActionResult> GetMediasInProduct(string product, string project)
+        {
+            List<MediaRequest> mediaRequests = new List<MediaRequest>();
+            var files = await dropboxClient.Files.ListFolderAsync("/projects/" + project + "/medias/" + product);
+            foreach (var file in files.Entries)
+            {
+                MediaRequest mediaRequest=new MediaRequest(); ;
+                mediaRequest.path = file.PathDisplay;
+                mediaRequest.name=file.Name;
+                mediaRequests.Add(mediaRequest);
+                
+            }
+            // return links;
+            foreach (var media in mediaRequests)
+            {  
+               
+                var link = await dropboxClient.Files.GetTemporaryLinkAsync(media.path);
+                media.path = link.Link;
+            }
+            return Ok(mediaRequests);
         }
 
+
+        [HttpGet("GetFolders/{folderPath}")]
+        public async Task<ActionResult> GetFolders(string folderPath)
+        {
+            List<string> folders = new List<string>();
+            try
+            {
+                Console.WriteLine(folderPath);
+                var listFolderResult = await dropboxClient.Files.ListFolderAsync(HttpUtility.UrlDecode(folderPath));
+               
+                foreach (var item in listFolderResult.Entries)
+                {
+                    if (item.IsFolder)
+                    {
+                        var folder = (FolderMetadata)item;
+                        folders.Add(folder.Name);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+            return Ok(folders);
+
+        }
+        public class UploadRequestModel
+        {
+            public string ImageName { get; set; }
+            public string Platform { get; set; }
+        }
     }
 }

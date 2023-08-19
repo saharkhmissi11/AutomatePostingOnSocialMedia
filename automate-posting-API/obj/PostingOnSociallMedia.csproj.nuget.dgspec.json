@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\AutomatePostingg\\automate-posting-API\\PostingOnSociallMedia.csproj": {}
+    "C:\\AutomatePosting\\automate-posting-API\\PostingOnSociallMedia.csproj": {}
   },
   "projects": {
-    "C:\\AutomatePostingg\\automate-posting-API\\PostingOnSociallMedia.csproj": {
+    "C:\\AutomatePosting\\automate-posting-API\\PostingOnSociallMedia.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\AutomatePostingg\\automate-posting-API\\PostingOnSociallMedia.csproj",
+        "projectUniqueName": "C:\\AutomatePosting\\automate-posting-API\\PostingOnSociallMedia.csproj",
         "projectName": "PostingOnSociallMedia",
-        "projectPath": "C:\\AutomatePostingg\\automate-posting-API\\PostingOnSociallMedia.csproj",
+        "projectPath": "C:\\AutomatePosting\\automate-posting-API\\PostingOnSociallMedia.csproj",
         "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-        "outputPath": "C:\\AutomatePostingg\\automate-posting-API\\obj\\",
+        "outputPath": "C:\\AutomatePosting\\automate-posting-API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -65,6 +65,18 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[7.0.9, )"
+            },
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[8.1.0, )"
+            },
+            "MySql.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[7.0.5, )"
+            },
+            "MySqlConnector": {
+              "target": "Package",
+              "version": "[2.2.7, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
