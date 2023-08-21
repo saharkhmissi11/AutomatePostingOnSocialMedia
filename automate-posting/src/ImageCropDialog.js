@@ -156,6 +156,7 @@ const ImageCropDialog = ({
           primaryProduct: product,
           secondaryProducts: visibleProductsReference,
           imagePath: imagePath,
+          mediaName:media.name,
           platform: selectedPlatform
         };
           client.post("Process/begin", requestBody, {

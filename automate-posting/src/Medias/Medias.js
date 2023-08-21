@@ -38,7 +38,7 @@ const Medias = ({
     const onPlatformSelect = (p) => {
         setPlatform(p)
     }
-    console.log(selectedProduct)
+    //console.log(selectedProduct)
     return (
         <>
             {selectedProduct && platform && (

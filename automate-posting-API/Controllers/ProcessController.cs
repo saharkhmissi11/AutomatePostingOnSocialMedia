@@ -38,14 +38,16 @@ namespace PostingOnSociallMedia.Controllers
             HttpClient httpClient = new HttpClient();
             string primaryProduct = requestModel.primaryProduct;
             string secondaryProducts = requestModel.secondaryProducts;
+            string mediaName= requestModel.mediaName;   
             string platform = requestModel.platform;
             string uniqueFileName = Guid.NewGuid().ToString("N") + "." + "jpg";
-            string imagePath = getImagePath(requestModel.imagePath, platform, uniqueFileName);
+            string imagePath = getImagePath(requestModel.imagePath, platform, mediaName);
 
             var camunda = new CamundaEngineClient(new System.Uri("http://localhost:8080/engine-rest/engine/default/"), null, null);
             string processInstanceId = camunda.BpmnWorkflowService.StartProcessInstance("PostingProcess", new Dictionary<string, object>() {
                     {"imagePath", imagePath },
                     {"platform", platform },
+                    {"mediaName", mediaName },
                     {"primaryProductReference",primaryProduct},
                     {"secondaryProductsReferences",secondaryProducts},
                 });
@@ -70,7 +72,7 @@ namespace PostingOnSociallMedia.Controllers
                 return new Bitmap(stream);
             }
         }
-        static string getImagePath(string path64, string platform, string uniqueFileName)
+        static string getImagePath(string path64, string platform, string mediaName)
         {
             string imageData = path64.Substring(path64.IndexOf(',') + 1);
             byte[] decodedImage = Convert.FromBase64String(imageData);
@@ -81,7 +83,7 @@ namespace PostingOnSociallMedia.Controllers
             Bitmap bitmap = new Bitmap(ms);
 
 
-            string savePath = @"C:/automate-posting/ProductsCropped/" + platform + "/" + uniqueFileName;  // Update file extension if needed
+            string savePath = @"C:/automate-posting/ProductsCropped/" + platform + "/" + mediaName;  // Update file extension if needed
             // Ensure the directory exists
 
             // Save the Bitmap as an image file

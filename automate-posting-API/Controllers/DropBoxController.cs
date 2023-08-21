@@ -21,7 +21,7 @@ namespace PostingOnSocialMedia.Controllers
     public class DropBoxController : ControllerBase
     {
         private readonly SfSezaneContext _context;
-        DropboxClient dropboxClient = new DropboxClient("sl.BkefYtEFvUMQNCmxS4A0-CaTyNbvcymPShqsAVVlK0n-HKfbQz2zTW2u7zhCWBELf1uME6kX2VP75rfkOeqJVPlmHKL8aSoP58B_u-QOE2g_4uWkyNIyBU70VeqHSv0fbwQGtH9P8Ht6d2IMvWi2tW8");
+        DropboxClient dropboxClient = new DropboxClient("sl.BkhZPDP54fuseKMBagP987hUIduCcak2WLmI8Yh_USsVz6L18WYmyntNmuzQWrl2HxmLm5zK1Six7-GKjSv1Ox2Sd7Gus4XuTSW4bSlrESKCSrOeaO45GbE6LOi6yMmC1Cqqz0TkQ2hzdfUc4DM3F1Q");
         [HttpGet("Download/{product}")]
         //path="/Products/image.jpg"
         public async Task<ActionResult<string>> Download(string product)
