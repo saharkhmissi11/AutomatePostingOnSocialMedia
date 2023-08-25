@@ -1,20 +1,13 @@
-﻿using Aspose.Imaging.Xmp;
-using CamundaClient.Dto;
+﻿using CamundaClient.Dto;
 using CamundaClient.Worker;
 using System.Drawing;
 using System.Drawing.Imaging;
 namespace PostingOnSocialMedia.Workers
 {
     [ExternalTaskTopic("Add-Metadata")]
-    //With this annotation, the system knows that this class  is a camunda task worker
-    [ExternalTaskVariableRequirements("imagePath", "platform", "primaryProductReference", "secondaryProductsReferences")] //required variables in order to execute the task worker
+    [ExternalTaskVariableRequirements("imagePath", "platform", "primaryProductReference", "secondaryProductsReferences")] 
     public class Add_Metadata : IExternalTaskAdapter
-    {
-        public void AddMD(string platform)
-        {
-            Image image = Image.FromFile(platform);
-
-        }
+    {   
         public void Execute(ExternalTask externalTask, ref Dictionary<string, object> resultVariables)
         {
             Console.WriteLine("Add-Metadata starts");
@@ -24,11 +17,6 @@ namespace PostingOnSocialMedia.Workers
             string secondaryProductsReferences = Convert.ToString(externalTask.Variables["secondaryProductsReferences"].Value);
             try
             {
-                /*Dictionary<string, string> platforms = new Dictionary<string, string>();
-                platforms.Add("Facebook", imagePathFacebook);
-                platforms.Add("Instagram", imagePathInstagram);
-                platforms.Add("Twitter", imagePathTwitter);*/
-
                 Image image = Image.FromFile(imagePath);
                 PropertyItem propertyItem = (PropertyItem)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(PropertyItem));
                 string keyWords = primaryProductReference + ";" + secondaryProductsReferences;
@@ -44,7 +32,6 @@ namespace PostingOnSocialMedia.Workers
                 image.Save(newImagePath, ImageFormat.Jpeg);
                 string variable = "imagePathToUpload";
                 resultVariables.Add(variable, newImagePath);
-                resultVariables.Add("imageName", Path.GetFileName(imagePath));
 
             }
             catch (Exception ex)

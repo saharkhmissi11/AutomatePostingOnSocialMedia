@@ -7,12 +7,11 @@ using static Dropbox.Api.TeamLog.ActorLogInfo;
 using System;
 using PostingOnSocialMedia.Models;
 using System.Web;
-using Aspose.Imaging.Xmp;
 using Microsoft.AspNetCore.Cors;
 using PostingOnSociallMedia.sf_sezane;
 using PostingOnSociallMedia.Models;
 
-namespace PostingOnSocialMedia.Controllers
+namespace PostingOnSocialMedia.Controllersvisu
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -21,7 +20,7 @@ namespace PostingOnSocialMedia.Controllers
     public class DropBoxController : ControllerBase
     {
         private readonly SfSezaneContext _context;
-        DropboxClient dropboxClient = new DropboxClient("sl.BkhZPDP54fuseKMBagP987hUIduCcak2WLmI8Yh_USsVz6L18WYmyntNmuzQWrl2HxmLm5zK1Six7-GKjSv1Ox2Sd7Gus4XuTSW4bSlrESKCSrOeaO45GbE6LOi6yMmC1Cqqz0TkQ2hzdfUc4DM3F1Q");
+        DropboxClient dropboxClient = new DropboxClient("sl.Bkw2e-Glp19ZPPe95XpPbDyakbMznEPm8D9TwFjF2BMRk1cF5PICmpVMMppzwQkVT6P8i-GNSB69y478_-V5pjPiKnceUOPKPFET5YLhykspSv9RQ1_O6DJe-k8WHYJxg1ILyrbE4BRSn16gkv2s32Y");
         [HttpGet("Download/{product}")]
         //path="/Products/image.jpg"
         public async Task<ActionResult<string>> Download(string product)
@@ -55,13 +54,14 @@ namespace PostingOnSocialMedia.Controllers
         {
             string imageName = model.ImageName;
             string platform = model.Platform;
-
+            string projectName= model.ProjectName;
+            string productName = model.ProductName;
 
             string filePath = "C:/automate-posting/ProductsMD/" + platform + "/" + HttpUtility.UrlDecode(imageName);
             Console.WriteLine(filePath);
             try
             {
-                string dropboxFolderPath = "/UploadedMedias/" + platform;
+                string dropboxFolderPath = "/projects/" + projectName + "/social-medias/" + platform + "/" + productName;
                 Console.WriteLine(dropboxFolderPath);
                 string fileName = Path.GetFileName(filePath);
                 string dropboxFilePath = dropboxFolderPath + "/" + fileName;
@@ -84,45 +84,7 @@ namespace PostingOnSocialMedia.Controllers
             return Ok();
         }
 
-        [HttpGet("GetDisplayPath/{image}")]
-        public async Task<ActionResult<string>> GetDisplayPath(string image)
-        {
-            var link = await dropboxClient.Files.GetTemporaryLinkAsync("/Medias" + "/" + image);
-            if (link == null) { return NotFound(); }
-            return link.Link;
-
-        }
-         [HttpGet("GetImagesLinks")]
-         public async Task<ActionResult> GetImagesLinks()
-         {
-             var files = await dropboxClient.Files.ListFolderAsync("/Medias");
-             List<string> paths = new List<string>();
-             foreach (var file in files.Entries)
-             {
-                 paths.Add(file.Name);
-             }
-             return Ok(paths);
-         }
        
-        /// 
-      /* [HttpGet("GetMediasInProduct/{project}/{product}")]
-        public async Task<ActionResult> GetMediasInProduct(string product ,string project)
-        {
-            var files = await dropboxClient.Files.ListFolderAsync("/projects/"+project +"/medias/"+ product);
-            List<string> paths = new List<string>();
-            foreach (var file in files.Entries)
-            {
-                paths.Add(file.PathDisplay);
-            }
-            // return links;
-            List<string> links = new List<string>();
-            foreach (var path in paths)
-            {
-                var link = await dropboxClient.Files.GetTemporaryLinkAsync(path);
-                links.Add(link.Link);
-            }
-            return Ok(links);
-        }*/
         [HttpGet("GetMediasInProduct/{project}/{product}")]
         public async Task<ActionResult> GetMediasInProduct(string product, string project)
         {
@@ -176,6 +138,8 @@ namespace PostingOnSocialMedia.Controllers
         {
             public string ImageName { get; set; }
             public string Platform { get; set; }
+            public string ProjectName { get; set; }
+            public string ProductName { get; set; }
         }
     }
 }

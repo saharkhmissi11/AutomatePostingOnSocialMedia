@@ -39,6 +39,8 @@ namespace PostingOnSociallMedia.Controllers
             string primaryProduct = requestModel.primaryProduct;
             string secondaryProducts = requestModel.secondaryProducts;
             string mediaName= requestModel.mediaName;   
+            string projectName=requestModel.projectName;
+            string productName=requestModel.productName;
             string platform = requestModel.platform;
             string uniqueFileName = Guid.NewGuid().ToString("N") + "." + "jpg";
             string imagePath = getImagePath(requestModel.imagePath, platform, mediaName);
@@ -48,6 +50,8 @@ namespace PostingOnSociallMedia.Controllers
                     {"imagePath", imagePath },
                     {"platform", platform },
                     {"mediaName", mediaName },
+                    {"productName", productName },
+                    {"projectName", projectName },
                     {"primaryProductReference",primaryProduct},
                     {"secondaryProductsReferences",secondaryProducts},
                 });

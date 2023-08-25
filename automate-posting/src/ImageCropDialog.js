@@ -10,11 +10,11 @@ import twitter from './Images/twitter.avif'
 import Form from 'react-bootstrap/Form';
 
 import "./App.css"
-import "./ImageGallery/ImageGallery.css"
 import Modal from 'react-bootstrap/Modal';
-import { Col, Row, Container } from "react-bootstrap";
+import { Col, Row, Container, Spinner } from "react-bootstrap";
 import client from "./utils";
-
+import "./Projects/Projects"
+import Projects from "./Projects/Projects";
 const p = {
   Facebook: facebook,
   Fnstagram: instagram,
@@ -26,27 +26,19 @@ const aspectRatios = {
   Twitter: 1600 / 900,
 }
 const ImageCropDialog = ({
-  selectedPlatform, open, handleClose, project, product
+  selectedPlatform, open, handleClose, project, product, onCropCompleteAndBeginProcess
 }) => {
 
   const aspectRatio = aspectRatios[selectedPlatform];
-  //const [imageLinks, setImageLinks] = useState([]);
   const [mediaRequests, setMediaRequests] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [visibleProductsReference, setVisibleProductsReference] = useState('');
   const [mediaId, setMediaId] = useState();
   const [productId, setProductId] = useState();
   const [projectId, setProjectId] = useState();
-  /*useEffect(() => {
-    client.get(`DropBox/GetMediasInProduct/${project}/${product}`, { headers: { 'Content-Type': 'application/json', } })
-      .then(response => {
-        setImageLinks(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching image links:', error);
-      });
-  }, []);*/
+
   useEffect(() => {
+    setIsLoading(true);
     client.get(`DropBox/GetMediasInProduct/${project}/${product}`, {
       headers: {
         'Content-Type': 'application/json',
@@ -57,7 +49,8 @@ const ImageCropDialog = ({
       })
       .catch(error => {
         console.error('Error fetching media:', error);
-      });
+      })
+      .finally(() => setIsLoading(false));
   }, []);
   //Get ProductId
   useEffect(() => {
@@ -79,21 +72,7 @@ const ImageCropDialog = ({
         console.error('Error fetching productId :', error);
       });
   }, []);
-  /* useEffect(() => {
-     // Define your mediaId and projectId values
-     const mediaId = 123;
-     const projectId = 456;
- 
-     // Make the HTTP GET request
-     client.get(`/getVisibleProducts/${mediaId}/${projectId}`)
-       .then(response => {
-         const data = response.data;
-         setVisibleProductsReference(data);
-       })
-       .catch(error => {
-         console.error('Error fetching visible products:', error);
-       });
-   }, []);*/
+
   const initialCropState = [];
   const initialZoomState = [];
   for (let i = 0; i < mediaRequests.length; i++) {
@@ -109,11 +88,6 @@ const ImageCropDialog = ({
     croppedAreaPixels.push(null);
   }
 
-  const VerticalLineWithShadow = () => {
-    return (
-      <div className="vertical-line"></div>
-    );
-  };
 
 
   const onCropChange = (crop, index) => {
@@ -146,103 +120,113 @@ const ImageCropDialog = ({
       mediaRequests.map(async (media, index) => {
         const mediaResponse = await client.get(`Database/getMediaIdByUrl/${encodeURIComponent("/shootingflow/projects/" + project + "/medias/" + product + "/" + media.name)}`);
         const mediaId = mediaResponse.data;
-        console.log("mediaid",mediaId)
-        console.log("productId",projectId)
+        console.log("mediaid", mediaId)
+        console.log("productId", projectId)
         const vpresponse = await client.get(`Database/getVisibleProducts/${mediaId}/${projectId}`)
         const visibleProductsReference = vpresponse.data;
-        console.log("visibleProductsReference",visibleProductsReference)
+        console.log("visibleProductsReference", visibleProductsReference)
         const imagePath = await getCroppedImg(media.path, croppedAreaPixels[index], selectedPlatform);
         const requestBody = {
           primaryProduct: product,
           secondaryProducts: visibleProductsReference,
           imagePath: imagePath,
-          mediaName:media.name,
+          mediaName: media.name,
+          projectName: project,
+          productName: product,
           platform: selectedPlatform
         };
-          client.post("Process/begin", requestBody, {
-            headers: {
-              'Content-Type': 'application/json', // Use 'application/json' for JSON data
-            },
-          })
-            .then(response => console.log("result put ", response))
-            .catch(error => console.error("Error:", error)) // Use error parameter to catch errors
+        client.post("Process/begin", requestBody, {
+          headers: {
+            'Content-Type': 'application/json', // Use 'application/json' for JSON data
+          },
+        })
+          .then(response => console.log("result put ", response))
+          
+          .catch(error => console.error("Error:", error)) // Use error parameter to catch errors
+         
       }))
   }
   return (
-    <Modal show={open} fullscreen={true} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>
-          <Row>
-            <Col xs={2}> <img style={{ width: '30px' }} src={cropLogo} /></Col>
-            <Col xs={10}>  <h2> Crop Image</h2></Col>
-          </Row>
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Row>
-          <Col xs={1}><img style={{ width: '35px' }} src={p[selectedPlatform]} /></Col> {'\u00a0'}
-          <Col xs={10}>  <h4 >{selectedPlatform}</h4></Col>
-        </Row><br></br>
-        <Container>
-          <Col xs={"auto"}></Col>
-          <Col>
+    <>
+
+
+
+
+      <Modal show={open} fullscreen={true} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>
             <Row>
-              {
-                mediaRequests.map((media, index) => (
-                  <>
-                    <Col xs="auto">
-                      <Row>
-                        <Cropper
-                          image={media.path}
-                          zoom={cropperZoom[index]}
-                          crop={cropperCrop[index]}
-                          aspect={aspectRatios[selectedPlatform]}
-                          onCropChange={crop => onCropChange(crop, index)}
-                          onZoomChange={zoom => onZoomChange(zoom, index)}
-                          onCropComplete={(croppedArea, crop) => onCropComplete(croppedArea, crop, index)}
-                          style={{
-                            containerStyle: {
-                              position: 'relative',
-                              width: '250px',
-                              height: '250px',
-                            },
-                            cropGuideStyle: {},
-                            mediaStyle: {},
-                          }
-                          }
-                        />  </Row><br></br>
-                      <Row>
-                        <input
-                          type="range"
-                          min={1}
-                          max={3}
-                          step={0.1}
-                          value={cropperZoom[index]}
-                          onInput={(e) => {
-                            onZoomChange(e.target.value, index); // Pass index to onZoomChange
-                          }}
-                          className="slider"
-                        ></input><br></br><br></br>
-                      </Row>
-                    </Col>
-                    <Col xs={"auto"}></Col>
-                  </>
-                )
-                )
-              }
+              <Col xs={2}> <img style={{ width: '30px' }} src={cropLogo} /></Col>
+              <Col xs={10}>  <h2> Crop Image</h2></Col>
             </Row>
-          </Col>
-        </Container>
-      </Modal.Body>
-      <Modal.Footer >
-        <Button style={{ width: '100px' }} variant="primary" onClick={() => { handleClose(); onBeginProcess() }}>
-          Crop
-        </Button>
-        <Button style={{ width: '100px' }} variant="secondary" onClick={() => { handleClose(); }}>
-          Cancel
-        </Button>
-      </Modal.Footer>
-    </Modal>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col xs={1}><img style={{ width: '35px' }} src={p[selectedPlatform]} /></Col> {'\u00a0'}
+            <Col xs={10}>  <h4 >{selectedPlatform}</h4></Col>
+          </Row><br></br>
+          <Container>
+            <Col xs={"auto"}></Col>
+            <Col xs="12" className="d-flex align-items-center justify-content-center text-align-center">
+              <Row>
+                {isLoading ? <><br></br> <Spinner style={{ width: '200px', height: '200px' }} animation="border" variant="primary" /><br></br> </>
+                  : mediaRequests.map((media, index) => (
+                    <>
+                      <Col xs="auto">
+                        <Row>
+                          <Cropper
+                            image={media.path}
+                            zoom={cropperZoom[index]}
+                            crop={cropperCrop[index]}
+                            aspect={aspectRatios[selectedPlatform]}
+                            onCropChange={crop => onCropChange(crop, index)}
+                            onZoomChange={zoom => onZoomChange(zoom, index)}
+                            onCropComplete={(croppedArea, crop) => onCropComplete(croppedArea, crop, index)}
+                            style={{
+                              containerStyle: {
+                                position: 'relative',
+                                width: '300px',
+                                height: '300px',
+                              },
+                              cropGuideStyle: {},
+                              mediaStyle: {},
+                            }
+                            }
+                          />  </Row><br></br>
+                        <Row>
+                          <input
+                            type="range"
+                            min={1}
+                            max={3}
+                            step={0.1}
+                            value={cropperZoom[index]}
+                            onInput={(e) => {
+                              onZoomChange(e.target.value, index); // Pass index to onZoomChange
+                            }}
+                            className="slider"
+                          ></input><br></br><br></br>
+                        </Row>
+                      </Col>
+                      <Col xs={"auto"}></Col>
+                    </>
+                  )
+                  )
+                }
+              </Row>
+            </Col>
+          </Container>
+        </Modal.Body>
+        <Modal.Footer >
+          <Button style={{ width: '100px' }} variant="primary" onClick={() => { handleClose(); onBeginProcess(); onCropCompleteAndBeginProcess() }}>
+            Crop
+          </Button>
+          <Button style={{ width: '100px' }} variant="secondary" onClick={() => { handleClose(); }}>
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 
 

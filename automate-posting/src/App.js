@@ -6,11 +6,7 @@ import ImageCropDialog from "./ImageCropDialog";
 import c0 from "./Images/10000.jpg";
 import c1 from "./Images/10001.jpg";
 import c2 from "./Images/10002.jpg";
-import ImageGallery from "./ImageGallery/ImageGallery";
-import SideBar from "./SideBar/SideBar";
 import Example from "./ImageCropDialogg";
-import Facebook from "./Facebook/Facebook";
-import Products from "./Projects/Projects";
 import Projects from "./Projects/Projects";
 import Medias from "./Medias/Medias";
 const initData = [
@@ -62,10 +58,7 @@ function App() {
       <BrowserRouter>
     <div className="App">
      <Routes>
-     <Route path="/ImageGallery" element={<ImageGallery/>} />
-     <Route path="/SideBar" element={<SideBar/>} />
      <Route path="/dialogbox" element={<Example/>} />
-     <Route path="/facebook" element={<Facebook/>} />
      <Route path="/projects" element={<Projects/>} />
      <Route path="/medias" element={<Medias/>} />
     </Routes>

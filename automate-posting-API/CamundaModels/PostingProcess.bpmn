@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1wnt81y" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.12.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.19.0">
+  <bpmn:process id="PostingProcess" name="PostingProcess" isExecutable="true" camunda:historyTimeToLive="120">
+    <bpmn:startEvent id="Add-Photo" name="Begin Process">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="imagePathFacebook" type="string" />
+          <camunda:formField id="primaryProductReference" type="string" />
+          <camunda:formField id="secondaryProductsReferences" type="string" />
+          <camunda:formField id="imagePathInstagram" type="string" />
+          <camunda:formField id="imagePathTwitter" type="string" />
+          <camunda:formField id="imageName" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_0tablqy</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0wzmeox">
+        <bpmn:targetRef>DataObjectReference_1tpyd3i</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Add-Metadata" name="Add-Metadata" camunda:type="external" camunda:topic="Add-Metadata">
+      <bpmn:incoming>Flow_0tablqy</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ba8tiv</bpmn:outgoing>
+      <bpmn:property id="Property_14zdpn1" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_1ozmnqz">
+        <bpmn:sourceRef>DataObjectReference_1tpyd3i</bpmn:sourceRef>
+        <bpmn:targetRef>Property_14zdpn1</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0puhcof">
+        <bpmn:targetRef>DataObjectReference_09r54xn</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_0rj7low" name="end process">
+      <bpmn:incoming>Flow_09n0arw</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Upload-Image" name="Upload-Image" camunda:type="external" camunda:topic="Upload-Image">
+      <bpmn:incoming>Flow_1ba8tiv</bpmn:incoming>
+      <bpmn:outgoing>Flow_09n0arw</bpmn:outgoing>
+      <bpmn:property id="Property_04rz38g" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_01uuk2i">
+        <bpmn:sourceRef>DataObjectReference_09r54xn</bpmn:sourceRef>
+        <bpmn:targetRef>Property_04rz38g</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_09n0arw" sourceRef="Upload-Image" targetRef="Event_0rj7low" />
+    <bpmn:dataObjectReference id="DataObjectReference_09r54xn" name="Image with metadata" dataObjectRef="DataObject_1xl7r94" />
+    <bpmn:dataObject id="DataObject_1xl7r94" />
+    <bpmn:sequenceFlow id="Flow_1ba8tiv" sourceRef="Add-Metadata" targetRef="Upload-Image" />
+    <bpmn:dataObjectReference id="DataObjectReference_1tpyd3i" name="Image resized(Fb-Insta-Twitter)" dataObjectRef="DataObject_1xmspyg" />
+    <bpmn:dataObject id="DataObject_1xmspyg" />
+    <bpmn:sequenceFlow id="Flow_0tablqy" sourceRef="Add-Photo" targetRef="Add-Metadata" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="PostingProcess">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="Add-Photo">
+        <dc:Bounds x="162" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="146" y="142" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_072kc5b_di" bpmnElement="Add-Metadata">
+        <dc:Bounds x="450" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0rj7low_di" bpmnElement="Event_0rj7low">
+        <dc:Bounds x="952" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="940" y="142" width="61" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1udnltc_di" bpmnElement="Upload-Image">
+        <dc:Bounds x="710" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_09r54xn_di" bpmnElement="DataObjectReference_09r54xn">
+        <dc:Bounds x="632" y="255" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="623" y="312" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_1tpyd3i_di" bpmnElement="DataObjectReference_1tpyd3i">
+        <dc:Bounds x="302" y="265" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="276" y="322" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_0wzmeox_di" bpmnElement="DataOutputAssociation_0wzmeox">
+        <di:waypoint x="191" y="131" />
+        <di:waypoint x="302" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_1ozmnqz_di" bpmnElement="DataInputAssociation_1ozmnqz">
+        <di:waypoint x="338" y="271" />
+        <di:waypoint x="451" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_0puhcof_di" bpmnElement="DataOutputAssociation_0puhcof">
+        <di:waypoint x="535" y="157" />
+        <di:waypoint x="632" y="267" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tablqy_di" bpmnElement="Flow_0tablqy">
+        <di:waypoint x="198" y="117" />
+        <di:waypoint x="450" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_01uuk2i_di" bpmnElement="DataInputAssociation_01uuk2i">
+        <di:waypoint x="667" y="255" />
+        <di:waypoint x="733" y="157" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09n0arw_di" bpmnElement="Flow_09n0arw">
+        <di:waypoint x="810" y="117" />
+        <di:waypoint x="952" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ba8tiv_di" bpmnElement="Flow_1ba8tiv">
+        <di:waypoint x="550" y="117" />
+        <di:waypoint x="710" y="117" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

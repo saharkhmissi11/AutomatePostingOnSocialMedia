@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './Projects.css'
 import client, { config } from '../utils';
 import Medias from '../Medias/Medias';
+import Alert from 'react-bootstrap/Alert';
 
-function Projects() {
+const Projects=({started})=> {
   const [projects, setProjects] = useState([]);
   const [productsInProject, setProductsInProject] = useState([]);
   const [selectedProject, setSelectedProject] = useState();
@@ -22,9 +23,10 @@ function Projects() {
   const onProjectSelect = (project) => {
     setSelectedProject(project)
   }
-
+  console.log("started",started)
   return (
     <>
+     {started && <Alert>This is an alert</Alert>}
     <br></br>
       <div className="projectsContainer">
         <h2>Projects</h2><br></br>
