@@ -20,15 +20,12 @@ const Medias = ({
     const [platform, setPlatform] = useState();
     const [show, setShow] = useState(false);
     const [showw, setShoww] = useState(false);
-
     const handleClose = () => setShow(false);
     const handleClosee = () => setShoww(false);
     const handleShow = () => setShow(true);
     const handleShoww = () => setShoww(true);
     const folderPath = '/projects/' + project + '/medias'
     useEffect(() => {
-
-        // Fetch image links from your API endpoint    
         client.get(`DropBox/GetFolders/${encodeURIComponent(folderPath)}`, { headers: { 'Content-Type': 'application/json', } })
             .then(response => {
                 setProductsInProject(response.data);
@@ -44,19 +41,18 @@ const Medias = ({
     const onPlatformSelect = (p) => {
         setPlatform(p)
     }
-    //console.log(selectedProduct)
     return (
         <>
             <Modal show={showw} onHide={handleClosee}>
                 <Modal.Body>
-                  <Alert variant="success"><br></br> Image Cropping and processing has started !<br></br><br></br></Alert>
+                    <Alert variant="success"><br></br> Image Cropping and processing has started !<br></br><br></br></Alert>
                 </Modal.Body>
                 <Modal.Footer >
-        <Button style={{ width: '100px' }} variant="primary" onClick={() => {handleClosee()}}>
-          Ok
-        </Button>
-        
-      </Modal.Footer>
+                    <Button style={{ width: '100px' }} variant="primary" onClick={() => { handleClosee() }}>
+                        Ok
+                    </Button>
+
+                </Modal.Footer>
             </Modal>
 
             {selectedProduct && platform && (
@@ -67,9 +63,9 @@ const Medias = ({
                     product={selectedProduct}
                     project={project}
                     onCropCompleteAndBeginProcess={() => {
-                        handleClosee(); // Close the ImageCropDialog modal
-                        handleShoww(); // Open the first modal
-                      }}
+                        handleClosee();
+                        handleShoww(); 
+                    }}
 
                 />
 

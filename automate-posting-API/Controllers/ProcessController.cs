@@ -82,16 +82,11 @@ namespace PostingOnSociallMedia.Controllers
             byte[] decodedImage = Convert.FromBase64String(imageData);
 
             MemoryStream ms = new MemoryStream(decodedImage);
-
-            // Create Bitmap from the memory stream
             Bitmap bitmap = new Bitmap(ms);
 
 
-            string savePath = @"C:/automate-posting/ProductsCropped/" + platform + "/" + mediaName;  // Update file extension if needed
-            // Ensure the directory exists
-
-            // Save the Bitmap as an image file
-            bitmap.Save(savePath, System.Drawing.Imaging.ImageFormat.Jpeg);  // Update ImageFormat if needed
+            string savePath = @"C:/automate-posting/ProductsCropped/" + platform + "/" + mediaName; 
+            bitmap.Save(savePath, System.Drawing.Imaging.ImageFormat.Jpeg); 
             return savePath;
         }
         [HttpGet("projects")]

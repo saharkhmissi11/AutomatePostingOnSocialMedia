@@ -15,14 +15,12 @@ namespace PostingOnSocialMedia.Controllersvisu
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[EnableCors("AllowOrigin")]
 
     public class DropBoxController : ControllerBase
     {
         private readonly SfSezaneContext _context;
         DropboxClient dropboxClient = new DropboxClient("sl.Bkw2e-Glp19ZPPe95XpPbDyakbMznEPm8D9TwFjF2BMRk1cF5PICmpVMMppzwQkVT6P8i-GNSB69y478_-V5pjPiKnceUOPKPFET5YLhykspSv9RQ1_O6DJe-k8WHYJxg1ILyrbE4BRSn16gkv2s32Y");
         [HttpGet("Download/{product}")]
-        //path="/Products/image.jpg"
         public async Task<ActionResult<string>> Download(string product)
         {
             string path;
@@ -98,7 +96,6 @@ namespace PostingOnSocialMedia.Controllersvisu
                 mediaRequests.Add(mediaRequest);
                 
             }
-            // return links;
             foreach (var media in mediaRequests)
             {  
                

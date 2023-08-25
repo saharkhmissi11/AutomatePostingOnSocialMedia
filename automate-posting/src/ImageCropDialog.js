@@ -8,7 +8,6 @@ import facebook from './Images/facebook.png'
 import instagram from './Images/instagram.png'
 import twitter from './Images/twitter.avif'
 import Form from 'react-bootstrap/Form';
-
 import "./App.css"
 import Modal from 'react-bootstrap/Modal';
 import { Col, Row, Container, Spinner } from "react-bootstrap";
@@ -88,8 +87,6 @@ const ImageCropDialog = ({
     croppedAreaPixels.push(null);
   }
 
-
-
   const onCropChange = (crop, index) => {
     setCropperCrop(prevCrop => {
       var newCrop = [...prevCrop];
@@ -114,7 +111,6 @@ const ImageCropDialog = ({
   };
   //begin the process
   const onBeginProcess = async () => {
-
     var requestBody = {}
     await Promise.all(
       mediaRequests.map(async (media, index) => {
@@ -137,21 +133,16 @@ const ImageCropDialog = ({
         };
         client.post("Process/begin", requestBody, {
           headers: {
-            'Content-Type': 'application/json', // Use 'application/json' for JSON data
+            'Content-Type': 'application/json',
           },
         })
           .then(response => console.log("result put ", response))
-          
-          .catch(error => console.error("Error:", error)) // Use error parameter to catch errors
-         
+
+          .catch(error => console.error("Error:", error))
       }))
   }
   return (
     <>
-
-
-
-
       <Modal show={open} fullscreen={true} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>
@@ -202,7 +193,7 @@ const ImageCropDialog = ({
                             step={0.1}
                             value={cropperZoom[index]}
                             onInput={(e) => {
-                              onZoomChange(e.target.value, index); // Pass index to onZoomChange
+                              onZoomChange(e.target.value, index);
                             }}
                             className="slider"
                           ></input><br></br><br></br>
@@ -228,9 +219,6 @@ const ImageCropDialog = ({
       </Modal>
     </>
   );
-
-
-
 };
 
 export default ImageCropDialog;
