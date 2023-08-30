@@ -24,7 +24,6 @@ namespace PostingOnSociallMedia.Controllers
         public async Task<ActionResult<int>> getIdByUrl(string url)
         {
             string encodedUrl = HttpUtility.UrlDecode(url);
-            Console.WriteLine(_context.Medias.FirstOrDefault(m => m.Url == encodedUrl).Id);
             return _context.Medias.FirstOrDefault(m => m.Url == encodedUrl).Id;
         }
         [HttpGet("getProductIdByReference/{reference}")]

@@ -41,7 +41,6 @@ using var reader = await command.ExecuteReaderAsync();
 if (await reader.ReadAsync())
 {
     var value = reader.GetValue(0); // This will get the first column of the first row
-    Console.WriteLine("look at this : "+value);
 }
 
 await connection.CloseAsync();

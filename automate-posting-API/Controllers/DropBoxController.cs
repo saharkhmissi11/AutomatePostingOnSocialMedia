@@ -19,7 +19,7 @@ namespace PostingOnSocialMedia.Controllersvisu
     public class DropBoxController : ControllerBase
     {
         private readonly SfSezaneContext _context;
-        DropboxClient dropboxClient = new DropboxClient("sl.Bkw2e-Glp19ZPPe95XpPbDyakbMznEPm8D9TwFjF2BMRk1cF5PICmpVMMppzwQkVT6P8i-GNSB69y478_-V5pjPiKnceUOPKPFET5YLhykspSv9RQ1_O6DJe-k8WHYJxg1ILyrbE4BRSn16gkv2s32Y");
+        DropboxClient dropboxClient = new DropboxClient("sl.BlHEhBgNfckqUiN4sYO_D1jvfFj7u-y77ThuMIxMt1lsxFbI53AyO0x3vIfQ39abl6IwYO4-RWEHoJRzOLpxj_GgTqXvpE_zg-BjU9fZp-QwTo-xNXF5oLx5XSfpx4OulmPPc06NtnnNE07HuHntFTc");
         [HttpGet("Download/{product}")]
         public async Task<ActionResult<string>> Download(string product)
         {
@@ -56,7 +56,6 @@ namespace PostingOnSocialMedia.Controllersvisu
             string productName = model.ProductName;
 
             string filePath = "C:/automate-posting/ProductsMD/" + platform + "/" + HttpUtility.UrlDecode(imageName);
-            Console.WriteLine(filePath);
             try
             {
                 string dropboxFolderPath = "/projects/" + projectName + "/social-medias/" + platform + "/" + productName;

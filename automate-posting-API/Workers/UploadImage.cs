@@ -15,7 +15,7 @@ namespace PostingOnSociallMedia.Workers
     {
 
         private HttpClient httpClient = new HttpClient();
-        private DropboxClient dropboxClient = new DropboxClient("sl.Bkw2e-Glp19ZPPe95XpPbDyakbMznEPm8D9TwFjF2BMRk1cF5PICmpVMMppzwQkVT6P8i-GNSB69y478_-V5pjPiKnceUOPKPFET5YLhykspSv9RQ1_O6DJe-k8WHYJxg1ILyrbE4BRSn16gkv2s32Y");
+        private DropboxClient dropboxClient = new DropboxClient("sl.BlHEhBgNfckqUiN4sYO_D1jvfFj7u-y77ThuMIxMt1lsxFbI53AyO0x3vIfQ39abl6IwYO4-RWEHoJRzOLpxj_GgTqXvpE_zg-BjU9fZp-QwTo-xNXF5oLx5XSfpx4OulmPPc06NtnnNE07HuHntFTc");
         public  void Execute(ExternalTask externalTask, ref Dictionary<string, object> resultVariables)
         {
            
